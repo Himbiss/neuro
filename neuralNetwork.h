@@ -25,6 +25,7 @@ private:
 public:
   neuralNetwork(int numInput, int numHidden, int numOutput);
   ~neuralNetwork();
+  int* epochPattern( double* pattern );
 };
 
 #endif

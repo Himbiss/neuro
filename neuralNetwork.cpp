@@ -1,4 +1,5 @@
 #include <cmath>
+#include <stdio.h>
 #include <cstdlib>
 
 #include "neuralNetwork.h"
@@ -24,6 +25,9 @@ neuralNetwork::neuralNetwork(int nI, int nH, int nO) : nInput(nI), nHidden(nH), 
   	outputNeurons[i] = 0;
   }
    
+  // bias neuron
+  inputNeurons[nInput] = -1;
+  
   // initialize weight tables
   wInputHidden = new( double*[nInput+1] );
   for (int i = 0; i <= nInput; i++) {
@@ -87,7 +91,36 @@ void neuralNetwork::epoch( double* pattern )
         inputNeurons[i] = pattern[i];	
    }
 
+   // hidden layer values
+   for (int j = 0; j < nHidden; j++) {
+   	hiddenNeurons[j] = 0;
+
+        for (int i = 0; i <= nInput; i++) {
+               hiddenNeurons[j] += inputNeurons[i] * wInputHidden[i][j];
+               hiddenNeurons[j] = sigmoidActivation( hiddenNeurons[j] );	
+        }
+   }
+
+   for (int k = 0; k < nOutput; k++) {
+        outputNeurons[k] = 0;
    
+        for (int j = 0; j <= nHidden; j++) {
+        	outputNeurons[k] += hiddenNeurons[j] * wHiddenOutput[j][k];
+                outputNeurons[k] = sigmoidActivation( outputNeurons[k] );
+        }		
+   }
+}
+
+int* neuralNetwork::epochPattern( double* pattern )
+{
+  epoch(pattern);
+
+  int* results = new int[nOutput];
+  for (int i = 0; i < nOutput; i++) {
+  	results[i] = outputNeurons[i];
+        printf("%g\n",outputNeurons[i]);
+  }
+  return results;
 }
 
 double neuralNetwork::sigmoidActivation( double t )
